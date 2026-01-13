@@ -1,8 +1,20 @@
-﻿public class Appointment
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace MediLink.Models
 {
-    public int Id { get; set; }
-    public string PatientId { get; set; }
-    public int DoctorId { get; set; }
-    public DateTime AppointmentDate { get; set; }
-    public string Status { get; set; }
+    public class Appointment
+    {
+        public int Id { get; set; }
+
+        public string PatientId { get; set; }
+
+        [Required]
+        public int DoctorId { get; set; }
+
+        [Required]
+        public DateTime AppointmentDate { get; set; }
+
+        public string Status { get; set; }
+    }
 }
