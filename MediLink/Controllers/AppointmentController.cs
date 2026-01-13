@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MediLink.Data;
 using MediLink.Models;
 
-
 namespace MediLink.Controllers
 {
     [Authorize]
@@ -13,12 +12,12 @@ namespace MediLink.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly SmsService _smsService;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public AppointmentController(
             ApplicationDbContext context,
             SmsService smsService,
-            UserManager<ApplicationUser> userManager)
+             UserManager<IdentityUser> userManager)
         {
             _context = context;
             _smsService = smsService;
