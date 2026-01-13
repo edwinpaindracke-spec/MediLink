@@ -1,8 +1,56 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome to MediLink";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* Full-page background */
+    .hero {
+        background-image: url('https://completehealthcare.com/article/comprehensive-health-management/');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        color: white;
+        position: relative;
+    }
+
+    /* Overlay to darken background for readability */
+    .hero::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5);
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        font-weight: 700;
+    }
+
+    .hero p {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+    }
+
+    .hero .btn {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="hero d-flex align-items-center justify-content-center text-center">
+    <div class="hero-content">
+        <h1>Welcome to MediLink</h1>
+        <p>Your trusted platform for booking healthcare appointments</p>
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="/Identity/Account/Register" class="btn btn-primary btn-lg">Register</a>
+            <a href="/Identity/Account/Login" class="btn btn-outline-light btn-lg">Login</a>
+        </div>
+    </div>
 </div>
