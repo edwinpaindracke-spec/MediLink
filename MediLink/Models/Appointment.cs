@@ -9,10 +9,10 @@ namespace MediLink.Models
 
         public string PatientId { get; set; }
 
-        
+        [Required]
         public int DoctorId { get; set; }
 
-        
+        [Required]
         public DateTime AppointmentDate { get; set; }
 
         public string Status { get; set; }

@@ -13,5 +13,7 @@ namespace MediLink.Data
         }
 
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Hospital> Hospitals { get; set; }
+
     }
 }

@@ -15,13 +15,30 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
-
 .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<SmsService>();
 
-
 var app = builder.Build();
+
+// Seed Hospital Data
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    // Check if hospital exists
+    if (!context.Hospitals.Any())
+    {
+        context.Hospitals.Add(new Hospital
+        {
+            Name = "City Hospital",
+            Address = "123 Main Street"
+        });
+
+        context.SaveChanges();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -31,7 +48,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -47,10 +63,11 @@ app.MapControllerRoute(
     pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}"
 );
 
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
+
 app.MapRazorPages();
 
 app.Run();
