@@ -11,7 +11,7 @@ public class SmsService
         _config = config;
     }
 
-    public void SendSms(string phone, string message)
+    public async Task SendSmsAsync(string phone, string message)
     {
         var accountSid = _config["Twilio:AccountSid"];
         var authToken = _config["Twilio:AuthToken"];
@@ -19,10 +19,11 @@ public class SmsService
 
         TwilioClient.Init(accountSid, authToken);
 
-        MessageResource.Create(
+        await MessageResource.CreateAsync(
             body: message,
             from: new Twilio.Types.PhoneNumber(fromPhone),
             to: new Twilio.Types.PhoneNumber(phone)
         );
+
     }
 }

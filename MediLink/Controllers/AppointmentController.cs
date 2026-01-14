@@ -18,49 +18,38 @@ namespace MediLink.Controllers
         public AppointmentController(
             ApplicationDbContext context,
             SmsService smsService,
-             UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
             _smsService = smsService;
             _userManager = userManager;
         }
 
-        // ✅ STEP 6C – Show booking page
+        // ✅ STEP 6C – Show booking page (GET Book)
         [HttpGet]
         public IActionResult Book(int? hospitalId)
         {
+            var appointment = new Appointment
+            {
+                HospitalId = hospitalId ?? 0,
+                DoctorId = 1 // temporary default, adjust as needed
+            };
+
             ViewBag.Hospitals = new SelectList(
                 _context.Hospitals.ToList(),
                 "Id",
                 "Name",
-                hospitalId
+                appointment.HospitalId
             );
 
-            ViewBag.DoctorId = 1; // temporary default
-
-            return View(new Appointment());
+            return View(appointment);
         }
 
-
-
-
+        // POST Book - confirm and save appointment
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book(Appointment appointment)
+        public async Task<IActionResult> ConfirmAppointment(Appointment appointment)
         {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Hospitals = new SelectList(
-                    _context.Hospitals.ToList(),
-                    "Id",
-                    "Name",
-                    appointment.HospitalId
-                );
-
-                ViewBag.DoctorId = appointment.DoctorId;
-                return View(appointment);
-            }
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
@@ -70,13 +59,48 @@ namespace MediLink.Controllers
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(MyAppointments));
+            // Fetch hospital for SMS
+            var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Id == appointment.HospitalId);
+
+            var formattedDateTime = appointment.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt");
+
+            if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+            {
+                string smsMessage =
+        $@"MediLink Appointment Confirmed ✅
+Hospital: {hospital?.Name}
+Date & Time: {formattedDateTime}
+Thank you for using MediLink.";
+
+                try
+                {
+                    await _smsService.SendSmsAsync(user.PhoneNumber, smsMessage);
+                }
+                catch { /* ignore SMS failures */ }
+            }
+
+            return RedirectToAction(nameof(Confirmation), new { id = appointment.Id });
         }
 
 
+        // Confirmation page showing appointment details
+        [HttpGet]
+        public async Task<IActionResult> Confirmation(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
 
+            var appointment = await _context.Appointments
+                .Include(a => a.Hospital)
+                .FirstOrDefaultAsync(a => a.Id == id && a.PatientId == user.Id);
 
-        // ✅ View logged-in patient's appointments
+            if (appointment == null)
+                return NotFound();
+
+            return View(appointment);
+        }
+
+        // View logged-in patient's appointments
         public async Task<IActionResult> MyAppointments()
         {
             var user = await _userManager.GetUserAsync(User);

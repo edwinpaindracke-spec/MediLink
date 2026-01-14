@@ -1,0 +1,22 @@
+﻿@model MediLink.Models.Appointment
+
+<h2>Confirm Your Appointment</h2>
+
+<div class="card p-3 mt-3">
+    <p><strong>Hospital:</strong> @ViewBag.HospitalName</p>
+    <p><strong>Date & Time:</strong> @Model.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt")</p>
+    <p><strong>Doctor ID:</strong> @Model.DoctorId</p>
+</div>
+
+<form asp-action="ConfirmAppointment" method="post">
+    @Html.AntiForgeryToken()
+
+    <!-- Hidden fields so the data is posted to ConfirmAppointment -->
+    <input type="hidden" asp-for="HospitalId" />
+    <input type="hidden" asp-for="DoctorId" />
+    <input type="hidden" asp-for="AppointmentDateTime" />
+
+    <button type="submit" class="btn btn-success mt-3">Confirm Appointment</button>
+</form>
+
+<a asp-action="Book" class="btn btn-secondary mt-2">Go Back</a>

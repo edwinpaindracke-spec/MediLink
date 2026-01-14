@@ -15,7 +15,7 @@ namespace MediLink.Models
         public int DoctorId { get; set; }
 
         [Required]
-        public DateTime AppointmentDate { get; set; }
+        public DateTime AppointmentDateTime { get; set; }
 
         public string Status { get; set; }
     }
