@@ -18,9 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Admin\Views\Doctors\" />
     <Folder Include="Areas\Admin\Views\Appointments\" />
     <Folder Include="Areas\Admin\Views\Users\" />
+    <Folder Include="Views\Admin\" />
+    <Folder Include="Views\Doctor\" />
   </ItemGroup>
 
 </Project>

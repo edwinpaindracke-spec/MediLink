@@ -26,46 +26,38 @@ namespace MediLink.Controllers
 
         // ✅ STEP 6C – Show booking page
         [HttpGet]
-        public IActionResult Book(int doctorId)
+        public IActionResult Book()
         {
-            ViewBag.DoctorId = doctorId;
+            // TEMP: default doctor so booking works
+            ViewBag.DoctorId = 1;
             return View();
         }
 
-        // ✅ STEP 6D – Save appointment + send SMS
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(Appointment appointment)
         {
             if (!ModelState.IsValid)
             {
-                return View(appointment);
+                ViewBag.DoctorId = appointment.DoctorId;
+                return View();
             }
 
             var user = await _userManager.GetUserAsync(User);
-
-            if (user == null)
-            {
-                return Unauthorized();
-            }
+            if (user == null) return Unauthorized();
 
             appointment.PatientId = user.Id;
             appointment.Status = "Booked";
 
             _context.Appointments.Add(appointment);
-            await _context.SaveChangesAsync(); // ✅ SAVE FIRST
-
-            // ✅ SEND SMS
-            if (!string.IsNullOrEmpty(user.PhoneNumber))
-            {
-                _smsService.SendSms(
-                    user.PhoneNumber,
-                    $"Your appointment is confirmed for {appointment.AppointmentDate:dd MMM yyyy HH:mm}"
-                );
-            }
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("MyAppointments");
         }
+
+
+
 
         // ✅ View logged-in patient's appointments
         public async Task<IActionResult> MyAppointments()

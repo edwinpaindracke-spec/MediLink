@@ -1,0 +1,26 @@
+﻿@model MediLink.Models.Appointment
+
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<h2>Book Appointment</h2>
+
+<form asp-controller="Appointment" asp-action="Book" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Appointment Date & Time</label>
+        <input name="AppointmentDate"
+               type="datetime-local"
+               class="form-control"
+               required />
+    </div>
+
+    <!-- ✅ FORCE DoctorId -->
+    <input type="hidden" name="DoctorId" value="@ViewBag.DoctorId" />
+
+    <button type="submit" class="btn btn-primary">
+        Confirm Appointment
+    </button>
+</form>
