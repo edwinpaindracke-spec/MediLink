@@ -1,22 +1,25 @@
-using System.Diagnostics;
+using MediLink.Data;
 using MediLink.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace MediLink.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var hospitals = _context.Hospitals.ToList();
+            return View(hospitals);
         }
+
 
         public IActionResult Privacy()
         {

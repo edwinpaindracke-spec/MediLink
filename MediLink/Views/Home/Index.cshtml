@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<MediLink.Models.Hospital>
+
 @{
     ViewData["Title"] = "Welcome to MediLink";
 }
@@ -59,3 +60,30 @@
         </div>
     </div>
 </div>
+
+<!-- Hospitals Section -->
+<div class="hospital-section container">
+    <h2 class="text-center mb-5">Our Hospitals</h2>
+
+    <div class="row g-4">
+        @foreach (var hospital in Model)
+        {
+            <div class="col-md-4">
+                <div class="hospital-card text-center p-3">
+                    <h5>@hospital.Name</h5>
+                    <p>@hospital.Address</p>
+                    <a href="@Url.Action("Book", "Appointment", new { hospitalId = hospital.Id })" class="btn btn-primary mt-3">
+                        Book Appointment
+                    </a>
+                </div>
+            </div>
+        }
+        }
+        }
+        else
+        {
+        <p class="text-center">No hospitals found!</p>
+        }
+    </div>
+</div>
+
