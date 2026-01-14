@@ -17,6 +17,17 @@
                required />
     </div>
 
+    <div class="mb-3">
+        <label class="form-label">Select Hospital</label>
+        <select asp-for="HospitalId"
+                asp-items="ViewBag.Hospitals"
+                class="form-select">
+            <option value="">-- Select Hospital --</option>
+        </select>
+        <span asp-validation-for="HospitalId" class="text-danger"></span>
+    </div>
+
+
     <!-- ✅ FORCE DoctorId -->
     <input type="hidden" name="DoctorId" value="@ViewBag.DoctorId" />
 

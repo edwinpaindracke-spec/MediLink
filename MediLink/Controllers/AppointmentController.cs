@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using MediLink.Data;
+﻿using MediLink.Data;
 using MediLink.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediLink.Controllers
 {
@@ -26,12 +27,21 @@ namespace MediLink.Controllers
 
         // ✅ STEP 6C – Show booking page
         [HttpGet]
-        public IActionResult Book()
+        public IActionResult Book(int? hospitalId)
         {
-            // TEMP: default doctor so booking works
-            ViewBag.DoctorId = 1;
-            return View();
+            ViewBag.Hospitals = new SelectList(
+                _context.Hospitals.ToList(),
+                "Id",
+                "Name",
+                hospitalId
+            );
+
+            ViewBag.DoctorId = 1; // temporary default
+
+            return View(new Appointment());
         }
+
+
 
 
         [HttpPost]
@@ -40,8 +50,15 @@ namespace MediLink.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.Hospitals = new SelectList(
+                    _context.Hospitals.ToList(),
+                    "Id",
+                    "Name",
+                    appointment.HospitalId
+                );
+
                 ViewBag.DoctorId = appointment.DoctorId;
-                return View();
+                return View(appointment);
             }
 
             var user = await _userManager.GetUserAsync(User);
@@ -53,7 +70,7 @@ namespace MediLink.Controllers
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("MyAppointments");
+            return RedirectToAction(nameof(MyAppointments));
         }
 
 
