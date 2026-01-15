@@ -25,31 +25,39 @@ namespace MediLink.Controllers
             _userManager = userManager;
         }
 
-        // ✅ STEP 6C – Show booking page (GET Book)
+        // ==============================
+        // GET: Book Appointment
+        // ==============================
         [HttpGet]
-        public IActionResult Book(int? hospitalId)
+        public IActionResult Book()
         {
-            var appointment = new Appointment
-            {
-                HospitalId = hospitalId ?? 0,
-                DoctorId = 1 // temporary default, adjust as needed
-            };
-
             ViewBag.Hospitals = new SelectList(
                 _context.Hospitals.ToList(),
                 "Id",
-                "Name",
-                appointment.HospitalId
+                "Name"
             );
 
-            return View(appointment);
+            return View(new Appointment());
         }
 
-        // POST Book - confirm and save appointment
+        // ==============================
+        // POST: Confirm Appointment
+        // ==============================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ConfirmAppointment(Appointment appointment)
+        public async Task<IActionResult> Book(Appointment appointment)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Hospitals = new SelectList(
+                    _context.Hospitals.ToList(),
+                    "Id",
+                    "Name"
+                );
+
+                return View(appointment);
+            }
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
@@ -59,31 +67,30 @@ namespace MediLink.Controllers
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            // Fetch hospital for SMS
-            var hospital = await _context.Hospitals.FirstOrDefaultAsync(h => h.Id == appointment.HospitalId);
-
-            var formattedDateTime = appointment.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt");
+            // Send SMS
+            var hospital = await _context.Hospitals
+                .FirstOrDefaultAsync(h => h.Id == appointment.HospitalId);
 
             if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
-                string smsMessage =
-        $@"MediLink Appointment Confirmed ✅
+                var message =
+$@"MediLink Appointment Confirmed ✅
 Hospital: {hospital?.Name}
-Date & Time: {formattedDateTime}
-Thank you for using MediLink.";
+Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}";
 
                 try
                 {
-                    await _smsService.SendSmsAsync(user.PhoneNumber, smsMessage);
+                    await _smsService.SendSmsAsync(user.PhoneNumber, message);
                 }
-                catch { /* ignore SMS failures */ }
+                catch { }
             }
 
             return RedirectToAction(nameof(Confirmation), new { id = appointment.Id });
         }
 
-
-        // Confirmation page showing appointment details
+        // ==============================
+        // GET: Confirmation Page
+        // ==============================
         [HttpGet]
         public async Task<IActionResult> Confirmation(int id)
         {
@@ -92,7 +99,8 @@ Thank you for using MediLink.";
 
             var appointment = await _context.Appointments
                 .Include(a => a.Hospital)
-                .FirstOrDefaultAsync(a => a.Id == id && a.PatientId == user.Id);
+                .FirstOrDefaultAsync(a =>
+                    a.Id == id && a.PatientId == user.Id);
 
             if (appointment == null)
                 return NotFound();
@@ -100,12 +108,15 @@ Thank you for using MediLink.";
             return View(appointment);
         }
 
-        // View logged-in patient's appointments
+        // ==============================
+        // GET: My Appointments
+        // ==============================
         public async Task<IActionResult> MyAppointments()
         {
             var user = await _userManager.GetUserAsync(User);
 
             var appointments = await _context.Appointments
+                .Include(a => a.Hospital)
                 .Where(a => a.PatientId == user.Id)
                 .ToListAsync();
 
