@@ -27,6 +27,8 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+
+
     // Check if hospital exists
     if (!context.Hospitals.Any())
     {

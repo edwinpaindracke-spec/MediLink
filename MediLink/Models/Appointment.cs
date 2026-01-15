@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MediLink.Models
 {
@@ -8,6 +10,10 @@ namespace MediLink.Models
         public int Id { get; set; }
 
         public string PatientId { get; set; }
+
+        [ForeignKey(nameof(PatientId))]
+        public IdentityUser Patient { get; set; }
+
         [Required]
         public int HospitalId { get; set; }
         public Hospital Hospital { get; set; }
@@ -18,5 +24,7 @@ namespace MediLink.Models
         public DateTime AppointmentDateTime { get; set; }
 
         public string Status { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

@@ -16,21 +16,33 @@
         @foreach (var item in Model)
         {
             <tr>
-                
+                <td>@item.Patient?.Email</td>
                 <td>@item.Hospital?.Name</td>
                 <td>@item.AppointmentDateTime.ToString("dd MMM yyyy hh:mm tt")</td>
-                <td>@item.Status</td>
                 <td>
-                    @if (item.Status == "Booked")
+                    <span class="badge
+                    @(item.Status == "Confirmed" ? "bg-success" :
+                                            item.Status == "Rejected" ? "bg-danger" : "bg-warning")">
+                    @item.Status
+                </span>
+            </td>
+            <td>
+                @if (item.Status == "Pending")
                     {
-                        <form asp-action="Approve" method="post" style="display:inline;">
+                        <form asp-action="Confirm" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@item.Id" />
-                            <button class="btn btn-success btn-sm">Approve</button>
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Confirm
+                            </button>
                         </form>
 
-                        <form asp-action="Cancel" method="post" style="display:inline;">
+                        <form asp-action="Reject" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@item.Id" />
-                            <button class="btn btn-danger btn-sm">Cancel</button>
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                Reject
+                            </button>
                         </form>
                     }
                 </td>

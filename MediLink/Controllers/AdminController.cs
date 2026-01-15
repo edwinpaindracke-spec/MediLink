@@ -20,6 +20,7 @@ namespace MediLink.Controllers
         {
             var appointments = await _context.Appointments
                 .Include(a => a.Hospital)
+                .Include(a => a.Patient)
                 .OrderByDescending(a => a.AppointmentDateTime)
                 .ToListAsync();
 
@@ -27,26 +28,27 @@ namespace MediLink.Controllers
         }
 
         [HttpPost]
-        
-        public async Task<IActionResult> Approve(int id)
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> Confirm(int id)
         {
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment == null) return NotFound();
 
-            appointment.Status = "Approved";
+            appointment.Status = "Confirmed";
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-       
-        public async Task<IActionResult> Cancel(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int id)
         {
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment == null) return NotFound();
 
-            appointment.Status = "Cancelled";
+            appointment.Status = "Rejected";
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

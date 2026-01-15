@@ -62,7 +62,7 @@ namespace MediLink.Controllers
             if (user == null) return Unauthorized();
 
             appointment.PatientId = user.Id;
-            appointment.Status = "Booked";
+            appointment.Status = "Pending";
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
@@ -74,9 +74,11 @@ namespace MediLink.Controllers
             if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
                 var message =
-$@"MediLink Appointment Confirmed ✅
+ $@"MediLink Appointment Received 📋
 Hospital: {hospital?.Name}
-Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}";
+Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}
+
+Status: Pending confirmation";
 
                 try
                 {
