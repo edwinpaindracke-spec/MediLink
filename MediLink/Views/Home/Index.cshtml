@@ -1,63 +1,72 @@
-﻿
+﻿@model IEnumerable<MediLink.Models.Hospital>
+
 @{
-    ViewData["Title"] = "Welcome to MediLink";
+    ViewData["Title"] = "Home - MediLink";
 }
 
+<section class="hero-section text-center py-5 bg-light">
+    <div class="container">
+        <h1 class="display-4 mb-3">Book Your Health Appointment Easily</h1>
+        <p class="lead mb-4">Find your nearest hospital and book an appointment in minutes</p>
+        <a href="@Url.Action("Book", "Appointment")" class="btn btn-primary btn-lg">Book Appointment</a>
+    </div>
+</section>
 
+<section class="quick-actions py-4">
+    <div class="container d-flex justify-content-center gap-3">
+        <a href="#" class="btn btn-outline-primary btn-lg flex-fill">
+            <i class="bi bi-telephone-fill"></i> Emergency Services
+        </a>
+        <a href="#" class="btn btn-outline-secondary btn-lg flex-fill">
+            <i class="bi bi-hospital"></i> Find Hospital Near Me
+        </a>
+    </div>
+</section>
 
+<section class="hospital-listing py-5">
+    <div class="container">
+        <h2 class="mb-4">Hospitals & Clinics</h2>
 
+        <form method="get" asp-controller="Home" asp-action="Index" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <input name="searchTerm" class="form-control" placeholder="Search by name..." value="@ViewData["SearchTerm"]" />
+            </div>
+            <div class="col-md-3">
+                <select name="province" class="form-select">
+                    <option value="">Select Province</option>
+                    @* Populate from your provinces list *@
+                    <option>Province 1</option>
+                    <option>Province 2</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="city" class="form-select">
+                    <option value="">Select City</option>
+                    @* Populate from your cities list *@
+                    <option>City A</option>
+                    <option>City B</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+            </div>
+        </form>
 
-<style>
-    /* Full-page background */
-    .hero {
-        background-image: url('https://images.unsplash.com/photo-1588776814546-3bfaeab20405?auto=format&fit=crop&w=1470&q=80');
-        background-size: cover;
-        background-position: center;
-        height: 100vh;
-        color: white;
-        position: relative;
-    }
-
-    /* Overlay to darken background for readability */
-    .hero::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background-color: rgba(0,0,0,0.5);
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 2;
-    }
-
-    .hero h1 {
-        font-size: 3rem;
-        font-weight: 700;
-    }
-
-    .hero p {
-        font-size: 1.5rem;
-        margin-bottom: 30px;
-    }
-
-    .hero .btn {
-        padding: 15px 30px;
-        font-size: 1.2rem;
-    }
-</style>
-
-<div class="hero d-flex align-items-center justify-content-center text-center">
-    <div class="hero-content">
-        <h1>Welcome to MediLink</h1>
-        <p>Your trusted platform for booking healthcare appointments</p>
-
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="/Identity/Account/Register" class="btn btn-primary btn-lg">Register</a>
-            <a href="/Identity/Account/Login" class="btn btn-outline-light btn-lg">Login</a>
+        <div class="row">
+            @foreach (var hospital in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@hospital.Name</h5>
+                            <p class="card-text">@hospital.Address</p>
+                            <a href="@Url.Action("Book", "Appointment", new { hospitalId = hospital.Id })" class="btn btn-outline-primary">
+                                Book Appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
-</div>
-
-
+</section>

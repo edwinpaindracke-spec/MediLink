@@ -1,4 +1,5 @@
 using MediLink.Data;
+using MediLink.Data.Seed;
 using MediLink.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,15 +7,19 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
@@ -22,14 +27,13 @@ builder.Services.AddScoped<SmsService>();
 
 var app = builder.Build();
 
+// ==============================
 // Seed Hospital Data
+// ==============================
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-
-
-    // Check if hospital exists
     if (!context.Hospitals.Any())
     {
         context.Hospitals.Add(new Hospital
@@ -40,6 +44,15 @@ using (var scope = app.Services.CreateScope())
 
         context.SaveChanges();
     }
+}
+
+// ==============================
+// Seed Roles & Admin User
+// ==============================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await IdentitySeeder.SeedRolesAndAdminAsync(services);
 }
 
 // Configure the HTTP request pipeline.
