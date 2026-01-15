@@ -45,6 +45,15 @@
                        class="btn btn-primary btn-lg me-3">
                         Book Appointment
                     </a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Admin" asp-action="Index">
+                                Admin Dashboard
+                            </a>
+                        </li>
+                    }
+
 
                     <partial name="_LoginPartial" />
                 </div>

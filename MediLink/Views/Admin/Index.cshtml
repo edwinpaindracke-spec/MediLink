@@ -1,0 +1,40 @@
+﻿@model IEnumerable<MediLink.Models.Appointment>
+
+<h2>Admin Dashboard</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Hospital</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                
+                <td>@item.Hospital?.Name</td>
+                <td>@item.AppointmentDateTime.ToString("dd MMM yyyy hh:mm tt")</td>
+                <td>@item.Status</td>
+                <td>
+                    @if (item.Status == "Booked")
+                    {
+                        <form asp-action="Approve" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button class="btn btn-success btn-sm">Approve</button>
+                        </form>
+
+                        <form asp-action="Cancel" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
