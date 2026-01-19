@@ -2,6 +2,11 @@
 
 @{
     ViewData["Title"] = "Home - MediLink";
+
+    
+    var cities = ViewBag.Cities as List<string>;
+
+
 }
 
 <section class="hero-section text-center py-5 bg-light">
@@ -27,36 +32,11 @@
     <div class="container">
         <h2 class="mb-4">Hospitals & Clinics</h2>
 
-        <form method="get" asp-controller="Home" asp-action="Index" class="row g-3 mb-4">
-            <div class="col-md-4">
-                <input name="searchTerm" class="form-control" placeholder="Search by name..." value="@ViewData["SearchTerm"]" />
-            </div>
-            <div class="col-md-3">
-                <select name="province" class="form-select">
-                    <option value="">Select Province</option>
-                    @* Populate from your provinces list *@
-                    <option>Province 1</option>
-                    <option>Province 2</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <select name="city" class="form-select">
-                    <option value="">Select City</option>
-                    @* Populate from your cities list *@
-                    <option>City A</option>
-                    <option>City B</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Apply</button>
-            </div>
-        </form>
-
         <div class="row">
             @foreach (var hospital in Model)
             {
                 <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 shadow-sm hospital-card" data-city="@hospital.City">
                         <div class="card-body">
                             <h5 class="card-title">@hospital.Name</h5>
                             <p class="card-text">@hospital.Address</p>
@@ -70,3 +50,19 @@
         </div>
     </div>
 </section>
+
+<!-- Client-side city filter -->
+<script>
+    document.getElementById("cityFilter").addEventListener("change", function () {
+        const selectedCity = this.value.toLowerCase();
+        const cards = document.querySelectorAll(".hospital-card");
+
+        cards.forEach(card => {
+            const city = card.getAttribute("data-city").toLowerCase();
+            card.style.display =
+                selectedCity === "" || city === selectedCity
+                    ? "block"
+                    : "none";
+        });
+    });
+</script>
