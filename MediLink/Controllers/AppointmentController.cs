@@ -29,52 +29,61 @@ namespace MediLink.Controllers
         // GET: Book Appointment
         // ==============================
         [HttpGet]
-        public IActionResult Book()
+        public async Task<IActionResult> Book(int hospitalId)
         {
-            ViewBag.Hospitals = new SelectList(
-                _context.Hospitals.ToList(),
-                "Id",
-                "Name"
-            );
+            var hospital = await _context.Hospitals
+                .FirstOrDefaultAsync(h => h.Id == hospitalId);
 
-            return View(new Appointment());
+            if (hospital == null) return NotFound();
+
+            // Pre-fill hospital info in the form
+            var model = new AppointmentViewModel
+            {
+                HospitalId = hospital.Id,
+                HospitalName = hospital.Name
+            };
+
+            return View(model);
         }
+
 
         // ==============================
         // POST: Confirm Appointment
         // ==============================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Book(Appointment appointment)
+        [Authorize]
+        public async Task<IActionResult> Book(AppointmentViewModel model)
         {
             if (!ModelState.IsValid)
-            {
-                ViewBag.Hospitals = new SelectList(
-                    _context.Hospitals.ToList(),
-                    "Id",
-                    "Name"
-                );
-
-                return View(appointment);
-            }
+                return View(model);
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
-            appointment.PatientId = user.Id;
-            appointment.Status = "Pending";
+            var appointment = new Appointment
+            {
+                HospitalId = model.HospitalId,
+                PatientName = model.PatientName,
+                Location = model.Location,
+                ProblemDescription = model.ProblemDescription,
+                AppointmentDateTime = model.AppointmentDateTime,
+                PatientId = user.Id,
+                Status = "Pending",
+                CreatedAt = DateTime.Now
+            };
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
             // Send SMS
             var hospital = await _context.Hospitals
-                .FirstOrDefaultAsync(h => h.Id == appointment.HospitalId);
+                .FirstOrDefaultAsync(h => h.Id == model.HospitalId);
 
             if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
                 var message =
- $@"MediLink Appointment Received 📋
+        $@"MediLink Appointment Received 📋
 Hospital: {hospital?.Name}
 Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}
 
@@ -89,6 +98,7 @@ Status: Pending confirmation";
 
             return RedirectToAction(nameof(Confirmation), new { id = appointment.Id });
         }
+
 
         // ==============================
         // GET: Confirmation Page

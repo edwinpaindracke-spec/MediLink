@@ -26,5 +26,8 @@ namespace MediLink.Models
         public string Status { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public string ProblemDescription { get; internal set; }
+        public string Location { get; internal set; }
+        public string PatientName { get; internal set; }
     }
 }

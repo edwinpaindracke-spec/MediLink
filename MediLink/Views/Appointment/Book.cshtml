@@ -1,33 +1,35 @@
-﻿@model MediLink.Models.Appointment
+﻿@model MediLink.Models.AppointmentViewModel
+
 
 @{
     ViewData["Title"] = "Book Appointment";
 }
 
-<h2>Book Appointment</h2>
+<h2>Book Appointment at @Model.HospitalName</h2>
 
-<form asp-controller="Appointment" asp-action="Book" method="post">
+<form asp-action="Book" method="post">
     @Html.AntiForgeryToken()
 
+    <!-- Hidden hospital ID -->
+    <input type="hidden" asp-for="HospitalId" />
+
     <div class="mb-3">
-        <label class="form-label">Appointment Date & Time</label>
-        <input name="AppointmentDate"
-               type="datetime-local"
-               class="form-control"
-               required />
+        <label asp-for="PatientName" class="form-label">Patient Name</label>
+        <input asp-for="PatientName" class="form-control" required />
+        <span asp-validation-for="PatientName" class="text-danger"></span>
     </div>
 
-        <div class="mb-3">
-        <label class="form-label">Select Hospital</label>
-        <select asp-for="HospitalId"
-                asp-items="ViewBag.Hospitals"
-                class="form-select">
-            <option value="">-- Select Hospital --</option>
-        </select>
-        <span asp-validation-for="HospitalId" class="text-danger"></span>
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label">Location</label>
+        <input asp-for="Location" class="form-control" required />
+        <span asp-validation-for="Location" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">
-        Confirm Appointment
-    </button>
+    <div class="mb-3">
+        <label asp-for="ProblemDescription" class="form-label">Describe your problem</label>
+        <textarea asp-for="ProblemDescription" class="form-control" rows="4" required></textarea>
+        <span asp-validation-for="ProblemDescription" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
 </form>
