@@ -53,7 +53,9 @@ An SMS gateway is integrated to send appointment confirmations and reminders to 
 - Secure data handling
 - Easy maintenance
 
-erDiagram for MediLink System
+
+
+erDiagram
 
     USER {
         int user_id PK
