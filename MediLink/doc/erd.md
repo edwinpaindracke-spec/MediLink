@@ -1,4 +1,4 @@
-﻿erDiagram for MediLink System   
+﻿erDiagram 
     USER {
         int user_id PK
         string name
