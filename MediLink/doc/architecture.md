@@ -2,29 +2,32 @@
 
 
 ## MediLink Architecture Components
-• Patient UI (registration, booking)
-• Doctor UI (view schedule)
-• Admin dashboard
-• Technologies (example):
-• HTML, CSS, JavaScript
-• ASP.NET Core MVC
 
-## Application Logic 
-Purpose: Business logic
-• Authentication & authorization
-• Appointment scheduling logic
-• SMS notification handling
-• Admin management
+- Patient UI (registration, booking)
+- Doctor UI (view schedule)
+- Admin dashboard
+- Technologies (example):
+- HTML, CSS, JavaScript
+- ASP.NET Core MVC
+
+## Application Logic
+
+- Purpose: Business logic
+- Authentication & authorization
+- Appointment scheduling logic
+- SMS notification handling
+- Admin management
 
 
 
 ## REST APIs
-• Purpose: Data storage
-• User data
-• Doctor profiles & schedules
-• Appointments
-• Admin records
-• MySQL Server
+
+- Purpose: Data storage
+- User data
+- Doctor profiles & schedules
+- Appointments
+- Admin records
+- MySQL Server
 
 ## Services
 - Purpose: Communication
