@@ -54,9 +54,10 @@ An SMS gateway is integrated to send appointment confirmations and reminders to 
 - Easy maintenance
 
 
+## Entity Relationship Diagram
 
+```mermaid
 erDiagram
-
     USER {
         int user_id PK
         string name
@@ -100,3 +101,4 @@ erDiagram
     APPOINTMENT ||--|| NOTIFICATION : triggers
     ADMIN ||--o{ DOCTOR : manages
     ADMIN ||--o{ APPOINTMENT : oversees
+APPOINTMENT : oversees
