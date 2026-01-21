@@ -3,7 +3,6 @@ using MediLink.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediLink.Controllers
@@ -29,14 +28,15 @@ namespace MediLink.Controllers
         // GET: Book Appointment
         // ==============================
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Book(int hospitalId)
         {
             var hospital = await _context.Hospitals
                 .FirstOrDefaultAsync(h => h.Id == hospitalId);
 
-            if (hospital == null) return NotFound();
+            if (hospital == null)
+                return NotFound();
 
-            // Pre-fill hospital info in the form
             var model = new AppointmentViewModel
             {
                 HospitalId = hospital.Id,
@@ -46,20 +46,26 @@ namespace MediLink.Controllers
             return View(model);
         }
 
-
         // ==============================
-        // POST: Confirm Appointment
+        // POST: Book Appointment
         // ==============================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
         public async Task<IActionResult> Book(AppointmentViewModel model)
         {
             if (!ModelState.IsValid)
+            {
+                // 🔴 IMPORTANT: re-load hospital name if validation fails
+                var hospital = await _context.Hospitals
+                    .FirstOrDefaultAsync(h => h.Id == model.HospitalId);
+
+                model.HospitalName = hospital?.Name;
                 return View(model);
+            }
 
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
             var appointment = new Appointment
             {
@@ -76,29 +82,34 @@ namespace MediLink.Controllers
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            // Send SMS
-            var hospital = await _context.Hospitals
-                .FirstOrDefaultAsync(h => h.Id == model.HospitalId);
-
+            // ==============================
+            // Send SMS Notification
+            // ==============================
             if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
             {
+                var hospital = await _context.Hospitals
+                    .FirstOrDefaultAsync(h => h.Id == model.HospitalId);
+
                 var message =
-        $@"MediLink Appointment Received 📋
+$@"MediLink Appointment Submitted Successfully ✅
 Hospital: {hospital?.Name}
 Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}
 
-Status: Pending confirmation";
+You can view your appointment in your profile.";
 
                 try
                 {
                     await _smsService.SendSmsAsync(user.PhoneNumber, message);
                 }
-                catch { }
+                catch
+                {
+                    // Log if needed, but don't block user
+                }
             }
 
+            TempData["Success"] = "Appointment submitted successfully!";
             return RedirectToAction(nameof(Confirmation), new { id = appointment.Id });
         }
-
 
         // ==============================
         // GET: Confirmation Page
@@ -107,7 +118,8 @@ Status: Pending confirmation";
         public async Task<IActionResult> Confirmation(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null) return Unauthorized();
+            if (user == null)
+                return Unauthorized();
 
             var appointment = await _context.Appointments
                 .Include(a => a.Hospital)
@@ -123,6 +135,7 @@ Status: Pending confirmation";
         // ==============================
         // GET: My Appointments
         // ==============================
+        [HttpGet]
         public async Task<IActionResult> MyAppointments()
         {
             var user = await _userManager.GetUserAsync(User);
