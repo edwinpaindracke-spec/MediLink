@@ -2,12 +2,12 @@
 
 ## Functional Requirement  
 
-	User registration and login.
-    Stores doctor’s profiles and schedules. 
-	Appointment booking and management. 
-	SMS notification. 
-	Admin dashboard.
-    Doctors can approve bookings
+ - User registration and login.
+ - Stores doctor’s profiles and schedules. 
+ - Appointment booking and management. 
+ - SMS notification. 
+ - Admin dashboard.
+ - Doctors can approve bookings
 
 
 ## Non-Functional Requirement
