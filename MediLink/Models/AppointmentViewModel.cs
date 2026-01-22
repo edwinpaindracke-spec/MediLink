@@ -20,6 +20,9 @@ namespace MediLink.Models
         [Required]
         [Display(Name = "Appointment Date & Time")]
         public DateTime AppointmentDateTime { get; set; }
-
+        
+        public int? DoctorId { get; set; }
+        public DateTime? AppointmentDate { get; set; }
+        public TimeSpan? AppointmentTime { get; set; }
     }
 }

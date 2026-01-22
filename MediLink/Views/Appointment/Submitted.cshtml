@@ -1,0 +1,29 @@
+﻿@model MediLink.Models.Appointment
+
+@{
+    ViewData["Title"] = "Submitted Successfully";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-success">
+        <h4>✅ Submitted Successfully</h4>
+        <p>Your request has been saved. Continue to complete your booking.</p>
+    </div>
+
+    <div class="card p-3 shadow-sm">
+        <p><strong>Hospital:</strong> @Model.Hospital?.Name</p>
+        <p><strong>Patient:</strong> @Model.PatientName</p>
+        <p><strong>Status:</strong> @Model.Status</p>
+
+        <a asp-action="Schedule"
+           asp-route-id="@Model.Id"
+           class="btn btn-primary mt-3">
+            Continue Booking
+        </a>
+
+        <a asp-action="MyAppointments"
+           class="btn btn-outline-secondary mt-3 ms-2">
+            View My Appointments
+        </a>
+    </div>
+</div>

@@ -53,15 +53,20 @@ namespace MediLink.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(AppointmentViewModel model)
         {
+            // 🔥 REQUIRED FIX
+            ModelState.Remove("DoctorId");
+            ModelState.Remove("AppointmentDateTime");
+            ModelState.Remove("HospitalName");
+
             if (!ModelState.IsValid)
             {
-                // 🔴 IMPORTANT: re-load hospital name if validation fails
                 var hospital = await _context.Hospitals
                     .FirstOrDefaultAsync(h => h.Id == model.HospitalId);
 
                 model.HospitalName = hospital?.Name;
                 return View(model);
             }
+
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -108,7 +113,12 @@ You can view your appointment in your profile.";
             }
 
             TempData["Success"] = "Appointment submitted successfully!";
-            return RedirectToAction(nameof(Confirmation), new { id = appointment.Id });
+
+
+
+            // ✅ THIS IS THE LINK YOU WANT
+            return RedirectToAction("Submitted", new { id = appointment.Id });
+
         }
 
         // ==============================
