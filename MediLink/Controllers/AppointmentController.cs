@@ -53,7 +53,7 @@ namespace MediLink.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(AppointmentViewModel model)
         {
-            // 🔥 REQUIRED FIX
+            // 🔥 Ignore Step-2 fields
             ModelState.Remove("DoctorId");
             ModelState.Remove("AppointmentDateTime");
             ModelState.Remove("HospitalName");
@@ -67,65 +67,35 @@ namespace MediLink.Controllers
                 return View(model);
             }
 
-
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return Unauthorized();
 
+            // ✅ STEP 1: SAVE BASIC INFO ONLY
             var appointment = new Appointment
             {
                 HospitalId = model.HospitalId,
                 PatientName = model.PatientName,
                 Location = model.Location,
                 ProblemDescription = model.ProblemDescription,
-                AppointmentDateTime = model.AppointmentDateTime,
+
+                            // ⛔ not yet
+
                 PatientId = user.Id,
-                Status = "Pending",
+                Status = "Draft",           // 👈 VERY IMPORTANT
                 CreatedAt = DateTime.Now
             };
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            // ==============================
-            // Send SMS Notification
-            // ==============================
-            if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
-            {
-                var hospital = await _context.Hospitals
-                    .FirstOrDefaultAsync(h => h.Id == model.HospitalId);
-
-                var message =
-$@"MediLink Appointment Submitted Successfully ✅
-Hospital: {hospital?.Name}
-Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}
-
-You can view your appointment in your profile.";
-
-                try
-                {
-                    await _smsService.SendSmsAsync(user.PhoneNumber, message);
-                }
-                catch
-                {
-                    // Log if needed, but don't block user
-                }
-            }
-
-            TempData["Success"] = "Appointment submitted successfully!";
-
-
-
-            // ✅ THIS IS THE LINK YOU WANT
+            // ✅ REDIRECT TO SUBMITTED PAGE
             return RedirectToAction("Submitted", new { id = appointment.Id });
-
         }
 
-        // ==============================
-        // GET: Confirmation Page
-        // ==============================
+
         [HttpGet]
-        public async Task<IActionResult> Confirmation(int id)
+        public async Task<IActionResult> Submitted(int id)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -141,6 +111,7 @@ You can view your appointment in your profile.";
 
             return View(appointment);
         }
+
 
         // ==============================
         // GET: My Appointments
