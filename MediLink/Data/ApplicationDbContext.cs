@@ -11,10 +11,11 @@ namespace MediLink.Data
             : base(options)
         {
         }
-
+        
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Hospital> Hospitals { get; set; }
-
+        // ✅ ADD THIS
+        public DbSet<Doctor> Doctors { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

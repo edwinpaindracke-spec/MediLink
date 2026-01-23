@@ -1,0 +1,40 @@
+﻿@model MediLink.Models.Appointment
+
+@{
+    ViewData["Title"] = "Schedule Appointment";
+}
+
+<div class="container mt-5">
+    <h3>Schedule Appointment</h3>
+
+    <div class="card p-4 shadow-sm">
+        <form asp-action="Schedule" method="post">
+            <input type="hidden" name="Id" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label class="form-label">Doctor</label>
+                <select name="DoctorId" class="form-select" required>
+                    <option value="">-- Select Doctor --</option>
+                    @foreach (var doctor in ViewBag.Doctors)
+                    {
+                        <option value="@doctor.Id">
+                            @doctor.FullName
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Date & Time</label>
+                <input type="datetime-local"
+                       name="AppointmentDateTime"
+                       class="form-control"
+                       required />
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Confirm Appointment
+            </button>
+        </form>
+    </div>
+</div>

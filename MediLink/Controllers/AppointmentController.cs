@@ -112,6 +112,79 @@ namespace MediLink.Controllers
             return View(appointment);
         }
 
+        // ==============================
+        // POST: Schedule Appointment
+        // ==============================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Schedule(Appointment model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized();
+
+            var appointment = await _context.Appointments
+                .FirstOrDefaultAsync(a =>
+                    a.Id == model.Id && a.PatientId == user.Id);
+
+            if (appointment == null)
+                return NotFound();
+
+            appointment.DoctorId = model.DoctorId;
+            appointment.AppointmentDateTime = model.AppointmentDateTime;
+            appointment.Status = "Confirmed";
+
+            await _context.SaveChangesAsync();
+
+            // ✅ SEND SMS AFTER FINAL CONFIRMATION
+            if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+            {
+                var hospital = await _context.Hospitals
+                    .FirstOrDefaultAsync(h => h.Id == appointment.HospitalId);
+
+                var message =
+                    "✔ MediLink Appointment Confirmed\n" +
+                    $"Hospital: {hospital?.Name}\n" +
+                    $"Date & Time: {appointment.AppointmentDateTime:dd MMM yyyy, hh:mm tt}\n\n" +
+                    "Thank you for using MediLink.";
+
+                try
+                {
+                    await _smsService.SendSmsAsync(user.PhoneNumber, message);
+                }
+                catch { }
+            }
+
+            return RedirectToAction("MyAppointments");
+        }
+
+
+        // ==============================
+        // GET: Schedule Appointment
+        // ==============================
+        [HttpGet]
+        public async Task<IActionResult> Schedule(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized();
+
+            var appointment = await _context.Appointments
+                .Include(a => a.Hospital)
+                .FirstOrDefaultAsync(a =>
+                    a.Id == id && a.PatientId == user.Id);
+
+            if (appointment == null)
+                return NotFound();
+
+            // Doctors for this hospital
+            ViewBag.Doctors = await _context.Doctors
+                .Where(d => d.HospitalId == appointment.HospitalId)
+                .ToListAsync();
+
+            return View(appointment);
+        }
+
 
         // ==============================
         // GET: My Appointments
