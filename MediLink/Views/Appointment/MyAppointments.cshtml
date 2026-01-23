@@ -1,5 +1,63 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<MediLink.Models.Appointment>
+
 @{
+    ViewData["Title"] = "My Appointments";
 }
+
+<div class="container mt-5">
+    <h3>My Appointments</h3>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info mt-3">
+            You have no appointments yet.
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-light">
+                <tr>
+                    <th>Hospital</th>
+                    <th>Patient</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var appt in Model)
+                {
+                    <tr>
+                        <td>@appt.Hospital?.Name</td>
+                        <td>@appt.PatientName</td>
+                        <td>
+                            @(appt.AppointmentDateTime.HasValue
+                                ? appt.AppointmentDateTime.Value.ToString("dd MMM yyyy, hh:mm tt")
+                                : "Not scheduled")
+                        </td>
+                        <td>
+                            <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : "secondary")">
+                                @appt.Status
+                            </span>
+                        </td>
+                        <td>
+                            @if (appt.Status == "Draft")
+                            {
+                                <a asp-action="Schedule"
+                                   asp-route-id="@appt.Id"
+                                   class="btn btn-sm btn-primary">
+                                    Continue Booking
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

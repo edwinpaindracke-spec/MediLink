@@ -18,7 +18,8 @@
             <tr>
                 <td>@item.Patient?.Email</td>
                 <td>@item.Hospital?.Name</td>
-                <td>@item.AppointmentDateTime.ToString("dd MMM yyyy hh:mm tt")</td>
+                <td>@(item.AppointmentDateTime?.ToString("dd MMM yyyy hh:mm tt") ?? "Not scheduled")</td>
+
                 <td>
                     <span class="badge
                     @(item.Status == "Confirmed" ? "bg-success" :
