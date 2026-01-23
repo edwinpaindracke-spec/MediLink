@@ -197,6 +197,7 @@ namespace MediLink.Controllers
             var appointments = await _context.Appointments
                 .Include(a => a.Hospital)
                 .Where(a => a.PatientId == user.Id)
+                .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
 
             return View(appointments);
