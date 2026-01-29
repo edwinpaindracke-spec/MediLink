@@ -32,10 +32,16 @@
                         <td>@appt.Hospital?.Name</td>
                         <td>@appt.PatientName</td>
                         <td>
-                            @(appt.Status == "Draft"
-                                                ? "Not scheduled"
-                                                : appt.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt"))
-                </td>
+                            @if (appt.Status == "Confirmed")
+                            {
+                                @appt.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt")
+                            }
+                            else
+                            {
+                                <span class="live-time" data-id="@appt.Id"></span>
+                            }
+                        </td>
+
 
                         <td>
                             <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : "secondary")">
@@ -62,3 +68,28 @@
         </table>
     }
 </div>
+<script>
+    function updateLiveTimes() {
+        const now = new Date();
+
+        const formatted =
+            now.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }) +
+            ", " +
+            now.toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            });
+
+        document.querySelectorAll(".live-time").forEach(el => {
+            el.textContent = formatted;
+        });
+    }
+
+    updateLiveTimes();               // initial load
+    setInterval(updateLiveTimes, 1000); // update every second
+</script>
