@@ -36,11 +36,12 @@
                             {
                                 @appt.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt")
                             }
-                            else
+                            else if (appt.Status == "Pending")
                             {
-                                <span class="live-time" data-id="@appt.Id"></span>
+                                <span class="text-muted">Awaiting approval</span>
                             }
                         </td>
+
 
 
                         <td>
@@ -49,19 +50,16 @@
                             </span>
                         </td>
                         <td>
-                            @if (appt.Status == "Draft")
+                            @if (appt.Status == "Pending")
                             {
-                                <a asp-action="Schedule"
-                                   asp-route-id="@appt.Id"
-                                   class="btn btn-sm btn-primary">
-                                    Continue Booking
-                                </a>
+                                <span class="badge bg-warning text-dark">Pending</span>
                             }
-                            else
+                            else if (appt.Status == "Confirmed")
                             {
-                                <span class="text-muted">—</span>
+                                <span class="badge bg-success">Confirmed</span>
                             }
                         </td>
+
                     </tr>
                 }
             </tbody>

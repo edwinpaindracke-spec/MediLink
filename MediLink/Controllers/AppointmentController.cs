@@ -82,7 +82,7 @@ namespace MediLink.Controllers
                 AppointmentDateTime = DateTime.Now,   // will be replaced later
 
                 PatientId = user.Id,
-                Status = "Draft",
+                Status = "Pending",
                 CreatedAt = DateTime.Now
             };
 
