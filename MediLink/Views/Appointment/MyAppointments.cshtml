@@ -32,10 +32,11 @@
                         <td>@appt.Hospital?.Name</td>
                         <td>@appt.PatientName</td>
                         <td>
-                            @(appt.AppointmentDateTime.HasValue
-                                ? appt.AppointmentDateTime.Value.ToString("dd MMM yyyy, hh:mm tt")
-                                : "Not scheduled")
-                        </td>
+                            @(appt.Status == "Draft"
+                                                ? "Not scheduled"
+                                                : appt.AppointmentDateTime.ToString("dd MMM yyyy, hh:mm tt"))
+                </td>
+
                         <td>
                             <span class="badge bg-@(appt.Status == "Confirmed" ? "success" : "secondary")">
                                 @appt.Status

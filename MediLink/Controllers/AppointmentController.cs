@@ -53,7 +53,7 @@ namespace MediLink.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(AppointmentViewModel model)
         {
-            // 🔥 Ignore Step-2 fields
+            // Ignore Step-2 fields
             ModelState.Remove("DoctorId");
             ModelState.Remove("AppointmentDateTime");
             ModelState.Remove("HospitalName");
@@ -71,7 +71,6 @@ namespace MediLink.Controllers
             if (user == null)
                 return Unauthorized();
 
-            // ✅ STEP 1: SAVE BASIC INFO ONLY
             var appointment = new Appointment
             {
                 HospitalId = model.HospitalId,
@@ -79,19 +78,20 @@ namespace MediLink.Controllers
                 Location = model.Location,
                 ProblemDescription = model.ProblemDescription,
 
-                            // ⛔ not yet
+                // ✅ TEMP VALUE (required by SQL)
+                AppointmentDateTime = DateTime.Now,   // will be replaced later
 
                 PatientId = user.Id,
-                Status = "Draft",           // 👈 VERY IMPORTANT
+                Status = "Draft",
                 CreatedAt = DateTime.Now
             };
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
 
-            // ✅ REDIRECT TO SUBMITTED PAGE
             return RedirectToAction("Submitted", new { id = appointment.Id });
         }
+
 
 
         [HttpGet]
